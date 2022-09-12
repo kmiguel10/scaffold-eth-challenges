@@ -18,6 +18,9 @@ contract DEX {
     using SafeMath for uint256; //outlines use of SafeMath for uint256 variables
     IERC20 token; //instantiates the imported contract
 
+    uint256 public totalLiquidity;
+    mapping(address => uint256) public liquidity;
+
     /* ========== EVENTS ========== */
 
     /**
@@ -81,7 +84,10 @@ contract DEX {
     /**
      * @notice sends $BAL tokens to DEX in exchange for Ether
      */
-    function tokenToEth(uint256 tokenInput) public returns (uint256 ethOutput) {}
+    function tokenToEth(uint256 tokenInput)
+        public
+        returns (uint256 ethOutput)
+    {}
 
     /**
      * @notice allows deposits of $BAL and $ETH to liquidity pool
@@ -95,5 +101,8 @@ contract DEX {
      * @notice allows withdrawal of $BAL and $ETH from liquidity pool
      * NOTE: with this current code, the msg caller could end up getting very little back if the liquidity is super low in the pool. I guess they could see that with the UI.
      */
-    function withdraw(uint256 amount) public returns (uint256 eth_amount, uint256 token_amount) {}
+    function withdraw(uint256 amount)
+        public
+        returns (uint256 eth_amount, uint256 token_amount)
+    {}
 }
