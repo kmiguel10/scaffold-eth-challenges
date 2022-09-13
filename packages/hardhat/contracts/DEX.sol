@@ -56,7 +56,12 @@ contract DEX {
     /**
      * @notice Emitted when liquidity removed from DEX and decreases LPT count within DEX.
      */
-    event LiquidityRemoved();
+    event LiquidityRemoved(
+        address sender,
+        uint256 amount,
+        uint256 ethWithdrawn,
+        uint256 tokenAmount
+    );
 
     /* ========== CONSTRUCTOR ========== */
 
@@ -183,5 +188,25 @@ contract DEX {
     function withdraw(uint256 amount)
         public
         returns (uint256 eth_amount, uint256 token_amount)
-    {}
+    {
+        //Check if the sender has enough liquidity to withdraw
+        require(
+            liquidity[msg.sender] >= amount,
+            "withdraw: sender does not have enough liquidity to withdraw."
+        );
+        uint256 ethReserve = address(this).balance;
+        uint256 tokenReserve = token.balanceOf(address(this));
+        uint256 ethWithdrawn;
+
+        ethWithdrawn = amount.mul(ethReserve) / totalLiquidity;
+
+        uint256 tokenAmount = amount.mul(tokenReserve) / totalLiquidity;
+        liquidity[msg.sender] = liquidity[msg.sender].sub(amount); //withdraw amount from liquidity mapping
+        totalLiquidity = totalLiquidity.sub(amount); //withdraw amount from totalLiquidity
+        (bool sent, ) = payable(msg.sender).call{value: ethWithdrawn}("");
+        require(sent, "withdraw(): revert in transferring eth to you!");
+        require(token.transfer(msg.sender, tokenAmount));
+        emit LiquidityRemoved(msg.sender, amount, ethWithdrawn, tokenAmount);
+        return (ethWithdrawn, tokenAmount);
+    }
 }
