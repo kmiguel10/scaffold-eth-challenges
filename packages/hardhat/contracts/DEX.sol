@@ -203,7 +203,7 @@ contract DEX {
         uint256 tokenAmount = amount.mul(tokenReserve) / totalLiquidity;
         liquidity[msg.sender] = liquidity[msg.sender].sub(amount); //withdraw amount from liquidity mapping
         totalLiquidity = totalLiquidity.sub(amount); //withdraw amount from totalLiquidity
-        (bool sent, ) = payable(msg.sender).call{value: ethWithdrawn}("");
+        (bool sent, ) = payable(msg.sender).call{value: ethWithdrawn}(""); //withdraw ethereum
         require(sent, "withdraw(): revert in transferring eth to you!");
         require(token.transfer(msg.sender, tokenAmount));
         emit LiquidityRemoved(msg.sender, amount, ethWithdrawn, tokenAmount);
